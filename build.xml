@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ServerAnalyzerFilter" default="jar" basedir=".">
+    <property name="src.dir" value="src/main/java"/>
+    <property name="resources.dir" value="src/main/resources"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir" value="${build.dir}/lib"/>
+    <property name="jar.file" value="server-analyzer-filter.jar"/>
+    <property name="lib.dir" value="lib"/>
+    <property name="servlet-api.jar" value="${lib.dir}/javax.servlet-api-4.0.1.jar"/>
+    <property name="java.source.version" value="11"/>
+    <property name="java.target.version" value="11"/>
+    
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+    
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+    
+    <target name="init">
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${jar.dir}"/>
+        <mkdir dir="${lib.dir}"/>
+    </target>
+    
+    <!-- Development dependencies -->
+    <target name="resolve-dependencies" depends="init">
+        <get src="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar"
+             dest="${servlet-api.jar}"
+             skipexisting="true"/>
+    </target>
+    
+    <target name="compile" depends="resolve-dependencies">
+        <javac srcdir="${src.dir}"
+               destdir="${classes.dir}"
+               source="${java.source.version}"
+               target="${java.target.version}"
+               debug="true"
+               includeantruntime="false">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+    
+    <target name="jar" depends="compile">
+        <jar destfile="${jar.dir}/${jar.file}">
+            <fileset dir="${classes.dir}"/>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Build-Date" value="${TODAY}"/>
+                <attribute name="Implementation-Version" value="1.0"/>
+            </manifest>
+        </jar>
+        <echo message="JAR file created: ${jar.dir}/${jar.file}"/>
+    </target>
+
+    <target name="all" depends="clean,jar"/>
+    
+</project> 
