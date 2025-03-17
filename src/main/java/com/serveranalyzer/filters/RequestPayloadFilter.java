@@ -47,7 +47,7 @@ public class RequestPayloadFilter implements Filter {
 
         ResponseSizeWrapper responseWrapper = new ResponseSizeWrapper(httpResponse);
         chain.doFilter(request, responseWrapper);
-        RequestData requestData = new RequestData(httpRequest.getMethod(), httpRequest.getRequestURI(), request.getContentLength(), responseWrapper.getDataSize(), httpRequest.getProtocol());
+        RequestData requestData = new RequestData(httpRequest,responseWrapper);
         bufferManager.addRequest(requestData.toJson());
         byte[] responseData = responseWrapper.getDataStream().toByteArray();
         response.getOutputStream().write(responseData);
