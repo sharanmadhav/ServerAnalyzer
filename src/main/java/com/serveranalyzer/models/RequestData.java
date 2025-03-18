@@ -4,6 +4,7 @@ import com.serveranalyzer.utils.ResponseSizeWrapper;
 import com.serveranalyzer.utils.ServerUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 
 public class RequestData {
     private final long timestamp;
@@ -22,9 +23,6 @@ public class RequestData {
     private final String userAgent;
     private final String parameters;
     private final String queryString;
-    private final long totalMemory = ServerUtils.totalMemory;
-    private final long freeMemory = ServerUtils.runtime.freeMemory();;
-    private final long usedMemory = totalMemory - freeMemory;
 
     public RequestData(HttpServletRequest servletRequest,ResponseSizeWrapper responseWrapper){
         this.timestamp = System.currentTimeMillis();
@@ -40,11 +38,26 @@ public class RequestData {
         this.contentType = servletRequest.getContentType();
         this.locale = servletRequest.getLocale().toString();
         this.userAgent = servletRequest.getHeader("user-agent");
-        this.headers = servletRequest.getHeaderNames().toString();
-        this.parameters = servletRequest.getParameterNames().toString();
+        this.headers = getCSV(servletRequest.getHeaderNames());
+        this.parameters = getCSV(servletRequest.getParameterNames());
         this.queryString = servletRequest.getQueryString();
     }
+    private String getCSV(Enumeration<String> names){
+        StringBuilder csv = new StringBuilder();
+        boolean firstVal = true;
+        while (names.hasMoreElements()) {
+            String headerName = names.nextElement();
 
+            if(firstVal){
+                csv.append(headerName);
+                firstVal = false;
+            }
+            else {
+                csv.append(",").append(headerName);
+            }
+        }
+        return csv.toString();
+    }
     public String toJson() {
         return new StringBuilder()
                 .append("{")
@@ -56,17 +69,19 @@ public class RequestData {
                 .append("\"protocol\":\"").append(protocol).append("\",")
                 .append("\"schema\":\"").append(schema).append("\",")
                 .append("\"serverName\":\"").append(serverName).append("\",")
-                .append("\"localAddress\":\"").append(localAddress).append("\",")
+                .append("\"ipV4Address\":\"").append(ServerUtils.ipV4Address).append("\",")
+                .append("\"ipV6Address\":\"").append(ServerUtils.ipV6Address).append("\",")
                 .append("\"localName\":\"").append(localName).append("\",")
                 .append("\"contentType\":\"").append(contentType).append("\",")
                 .append("\"locale\":\"").append(locale).append("\",")
                 .append("\"userAgent\":\"").append(userAgent).append("\",")
-                .append("\"headers\":\"").append(headers).append("\"")
+                .append("\"headers\":\"").append(headers).append("\",")
                 .append("\"parameters\":\"").append(parameters).append("\",")
                 .append("\"queryString\":\"").append(queryString).append("\",")
-                .append("\"totalMemory\":\"").append(totalMemory).append("\",")
-                .append("\"freeMemory\":\"").append(freeMemory).append("\",")
-                .append("\"usedMemory\":\"").append(usedMemory).append("\",")
+                .append("\"totalMemory\":\"").append(ServerUtils.totalMemory).append("\",")
+                .append("\"freeMemory\":\"").append(ServerUtils.runtime.freeMemory()).append("\",")
+
+                .append("\"usedMemory\":\"").append(ServerUtils.totalMemory - ServerUtils.runtime.freeMemory()).append("\"")
                 .append("}")
                 .toString();
     }

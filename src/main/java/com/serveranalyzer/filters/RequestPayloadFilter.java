@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 public class RequestPayloadFilter implements Filter {
     private static final Logger logger = Logger.getLogger(RequestPayloadFilter.class.getName());
-    private static String FIREBASE_URL = "https://logmanager-2ff65-default-rtdb.firebaseio.com/GlobalLogManager.json";
+    private static String FIREBASE_URL = "https://logmanager-2ff65-default-rtdb.firebaseio.com/logManager.json";
 
     private RequestBufferManager bufferManager;
 
