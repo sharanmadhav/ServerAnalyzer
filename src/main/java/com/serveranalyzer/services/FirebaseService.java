@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -15,20 +17,18 @@ public class FirebaseService {
     public FirebaseService(String firebaseUrl) {
         this.firebaseUrl = firebaseUrl;
     }
-
+    private String getFirebaseUrl(){
+        LocalDateTime now = LocalDateTime.now();
+        return firebaseUrl + "/" + now.getYear() + "/" + now.getMonth() + "/" + now.getDayOfMonth() + "/" + now.getHour() + "/" + now.getMinute() + ".json";
+    }
     public void sendData(List<String> data) {
-//        if(true){
-//            System.out.println("response data:::"+data);
-//            return;
-//        }
         if (data.isEmpty()) {
             return;
         }
-
         try {
-            URL url = new URL(firebaseUrl);
+            URL url = new URL(getFirebaseUrl());
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
+            conn.setRequestMethod("PUT");
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setDoOutput(true);
             StringBuilder jsonArray = new StringBuilder();
