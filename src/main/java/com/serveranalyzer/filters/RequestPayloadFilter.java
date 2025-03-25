@@ -15,24 +15,12 @@ import java.util.logging.Logger;
 
 public class RequestPayloadFilter implements Filter {
     private static final Logger logger = Logger.getLogger(RequestPayloadFilter.class.getName());
-    private static String FIREBASE_URL = "https://logmanager-2ff65-default-rtdb.firebaseio.com/logManager.json";
 
     private RequestBufferManager bufferManager;
 
     @Override
     public void init(FilterConfig filterConfig) {
-        String CUSTOM_FIREBASE_URL = filterConfig.getInitParameter("firebaseUrl");
-        if(CUSTOM_FIREBASE_URL != null && !CUSTOM_FIREBASE_URL.isEmpty()){
-            if(CUSTOM_FIREBASE_URL.startsWith(ServerUtils.secureURLPrefix)){
-                FIREBASE_URL = CUSTOM_FIREBASE_URL;
-            }
-            if(CUSTOM_FIREBASE_URL.startsWith(ServerUtils.unSecureURLPrefix)){
-                logger.log(Level.SEVERE,"The url must start with https");
-                return;
-            }
-        }
-
-
+        String FIREBASE_URL = "https://logmanager-2ff65-default-rtdb.firebaseio.com";
         FirebaseService firebaseService = new FirebaseService(FIREBASE_URL);
         bufferManager = new RequestBufferManager(firebaseService);
         logger.log(Level.INFO,"RequestPayloadFilter Initialized");
