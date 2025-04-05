@@ -1,4 +1,4 @@
 package com.serveranalyzer.models;
 
-public class Memory {
+public class GPUInfo {
 }
