@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Server Analyzer Tool for monitoring server performance and status">
+    <meta name="author" content="xAI">
+    <meta name="robots" content="index, follow">
+    <title>Server Analyzer Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container" role="application">
+        <header class="top-nav" role="banner">
+            <button class="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+            <h1>Server Analyzer</h1>
+            <div class="top-nav-actions">
+                <input type="search" id="search" placeholder="Search metrics..." class="search-bar" aria-label="Search server data">
+                <div class="notifications" role="alert" aria-live="polite">
+                    <span aria-hidden="true">🔔</span>
+                    <span class="badge">3</span>
+                    <span class="visually-hidden">3 new notifications</span>
+                </div>
+                <div class="user-profile" tabindex="0" role="button" aria-label="User profile: Admin">
+                    <span>👤</span> Admin
+                </div>
+            </div>
+        </header>
+
+        <nav class="sidebar hidden" role="navigation" aria-label="Main navigation">
+            <div class="custom-dropdown">
+                <select id="app-select" aria-label="Select an application">
+                    <option value="">Select Application</option>
+                    <option value="app1">App 1</option>
+                    <option value="app2">App 2</option>
+                </select>
+            </div>
+            <ul>
+                <li><a href="#dashboard" class="active" aria-current="page"><svg class="icon" viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg> Dashboard</a></li>
+                <li><a href="#hardware"><svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12z"/></svg> Hardware</a></li>
+                <li><a href="#performance"><svg class="icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg> Performance</a></li>
+                <li><a href="#network"><svg class="icon" viewBox="0 0 24 24"><path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/></svg> Network</a></li>
+                <li><a href="#logs"><svg class="icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg> Logs</a></li>
+                <li><a href="#alerts"><svg class="icon" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.1-1.6-5.6-4.5-6.3V4c0-.8-.7-1.5-1.5-1.5s-1.5.7-1.5 1.5v.7C7.6 5.4 6 7.9 6 11v5l-2 2v1h16v-1l-2-2z"/></svg> Alerts</a></li>
+                <li><a href="#components"><svg class="icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 13h-2v-2h2v2zm0-4h-2V7h2v4z"/></svg> Components</a></li>
+            </ul>
+        </nav>
+
+        <main class="content" role="main">
+            <section id="dashboard" class="grid-container" aria-labelledby="dashboard-heading">
+                <div class="grid-item full-width">
+                    <h1 id="dashboard-heading">Dashboard</h1>
+                    <p>Real-time server monitoring and analytics</p>
+                </div>
+                <div class="grid-item">
+                    <h2>Server Selection</h2>
+                    <div class="custom-dropdown">
+                        <select id="server-select" aria-label="Select a server">
+                            <option value="">Select a Server</option>
+                            <option value="server1">Server 1</option>
+                            <option value="server2">Server 2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Performance Metrics</h2>
+                    <canvas id="performanceChart" aria-label="Performance overview chart"></canvas>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Resource Utilization</h2>
+                    <canvas id="resourceChart" aria-label="Resource utilization chart"></canvas>
+                </div>
+            </section>
+
+            <section id="hardware" class="grid-container hidden" aria-labelledby="hardware-heading">
+                <div class="grid-item full-width">
+                    <h1 id="hardware-heading">Hardware</h1>
+                    <p>Detailed hardware specifications</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Hardware Overview</h2>
+                    <canvas id="hardwareChart" aria-label="Hardware usage chart"></canvas>
+                </div>
+            </section>
+
+            <section id="performance" class="grid-container hidden" aria-labelledby="performance-heading">
+                <div class="grid-item full-width">
+                    <h1 id="performance-heading">Performance</h1>
+                    <p>Detailed performance analytics</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Memory Usage</h2>
+                    <canvas id="memoryChart" aria-label="Memory usage chart"></canvas>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>CPU Utilization</h2>
+                    <canvas id="cpuChart" aria-label="CPU utilization chart"></canvas>
+                </div>
+            </section>
+
+            <section id="network" class="grid-container hidden" aria-labelledby="network-heading">
+                <div class="grid-item full-width">
+                    <h1 id="network-heading">Network</h1>
+                    <p>Network performance metrics</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Bandwidth Usage</h2>
+                    <canvas id="bandwidthChart" aria-label="Bandwidth usage chart"></canvas>
+                </div>
+            </section>
+
+            <section id="logs" class="grid-container hidden" aria-labelledby="logs-heading">
+                <div class="grid-item full-width">
+                    <h1 id="logs-heading">Logs</h1>
+                    <p>Server activity logs</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Log Trends</h2>
+                    <canvas id="logChart" aria-label="Log trends chart"></canvas>
+                </div>
+            </section>
+
+            <section id="alerts" class="grid-container hidden" aria-labelledby="alerts-heading">
+                <div class="grid-item full-width">
+                    <h1 id="alerts-heading">Alerts</h1>
+                    <p>Active server alerts</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Alert Trends</h2>
+                    <canvas id="alertChart" aria-label="Alert trends chart"></canvas>
+                </div>
+            </section>
+
+            <section id="components" class="grid-container hidden" aria-labelledby="components-heading">
+                <div class="grid-item full-width">
+                    <h1 id="components-heading">Components</h1>
+                    <p>Software components overview</p>
+                </div>
+                <div class="grid-item full-width">
+                    <h2>Component Usage</h2>
+                    <canvas id="componentChart" aria-label="Component usage chart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Toggle Sidebar
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        menuToggle.addEventListener('click', () => {
+            const isExpanded = !sidebar.classList.contains('hidden');
+            sidebar.classList.toggle('hidden');
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+        });
+
+        // Navigation Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('.grid-container');
+            const navLinks = document.querySelectorAll('.sidebar a');
+
+            // Show initial section (Dashboard)
+            sections.forEach(section => {
+                if (section.id !== 'dashboard') {
+                    section.classList.add('hidden');
+                } else {
+                    section.classList.remove('hidden');
+                }
+            });
+
+            // Handle navigation clicks
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+
+                    if (targetSection) {
+                        // Hide all sections
+                        sections.forEach(section => {
+                            section.classList.add('hidden');
+                        });
+
+                        // Show target section
+                        targetSection.classList.remove('hidden');
+
+                        // Update active link
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+
+                        // Ensure sidebar closes on mobile after selection
+                        if (window.innerWidth <= 768) {
+                            sidebar.classList.add('hidden');
+                            menuToggle.setAttribute('aria-expanded', 'false');
+                        }
+                    } else {
+                        console.warn(`Section "${targetId}" not found`);
+                    }
+                });
+            });
+        });
+
+        // Chart Configuration
+        const chartConfig = (ctx, type, labels, data, colors) => {
+            return new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '',
+                        data: data,
+                        backgroundColor: colors.background,
+                        borderColor: colors.border,
+                        borderWidth: 2,
+                        fill: type === 'line' ? false : true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#e8eaed' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            backgroundColor: '#202124',
+                            titleColor: '#fff',
+                            bodyColor: '#fff'
+                        }
+                    }
+                }
+            });
+        };
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', () => {
+            chartConfig(document.getElementById('performanceChart').getContext('2d'), 'line', ['Jan', 'Feb', 'Mar', 'Apr', 'May'], [65, 59, 80, 81, 56], { background: 'rgba(26, 115, 232, 0.2)', border: '#1a73e8' });
+            chartConfig(document.getElementById('resourceChart').getContext('2d'), 'bar', ['CPU', 'Memory', 'Disk'], [75, 60, 85], { background: '#34a853', border: '#34a853' });
+            chartConfig(document.getElementById('hardwareChart').getContext('2d'), 'bar', ['CPU', 'RAM', 'Storage'], [80, 65, 90], { background: '#34a853', border: '#34a853' });
+            chartConfig(document.getElementById('memoryChart').getContext('2d'), 'bar', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], [12, 19, 3, 5, 2], { background: '#34a853', border: '#34a853' });
+            chartConfig(document.getElementById('cpuChart').getContext('2d'), 'line', ['10:00', '10:05', '10:10', '10:15'], [45, 60, 55, 50], { background: 'rgba(251, 188, 4, 0.2)', border: '#fbbc04' });
+            chartConfig(document.getElementById('bandwidthChart').getContext('2d'), 'bar', ['In', 'Out'], [75, 50], { background: '#1a73e8', border: '#1a73e8' });
+            chartConfig(document.getElementById('logChart').getContext('2d'), 'line', ['Day 1', 'Day 2', 'Day 3'], [10, 15, 8], { background: 'rgba(26, 115, 232, 0.2)', border: '#1a73e8' });
+            chartConfig(document.getElementById('alertChart').getContext('2d'), 'bar', ['Day 1', 'Day 2', 'Day 3'], [5, 3, 7], { background: '#d93025', border: '#d93025' });
+            chartConfig(document.getElementById('componentChart').getContext('2d'), 'bar', ['Comp1', 'Comp2', 'Comp3'], [30, 45, 25], { background: '#34a853', border: '#34a853' });
+        });
+    </script>
+</body>
+</html>
