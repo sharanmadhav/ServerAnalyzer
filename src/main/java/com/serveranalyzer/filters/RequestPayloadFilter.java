@@ -15,14 +15,21 @@ import java.util.logging.Logger;
 
 public class RequestPayloadFilter implements Filter {
     private static final Logger logger = Logger.getLogger(RequestPayloadFilter.class.getName());
-
     private RequestBufferManager bufferManager;
 
     @Override
     public void init(FilterConfig filterConfig) {
         String FIREBASE_URL = "https://logmanager-2ff65-default-rtdb.firebaseio.com";
+        String URLJSONPATH;
+        if((filterConfig.getInitParameter(ServerUtils.USERKEY) != null) && (filterConfig.getInitParameter(ServerUtils.URLJSONFILE) != null)){
+            FIREBASE_URL = FIREBASE_URL+"/"+filterConfig.getInitParameter(ServerUtils.USERKEY);
+            URLJSONPATH = filterConfig.getInitParameter(ServerUtils.URLJSONFILE);
+        }
+        else {
+            return;
+        }
         FirebaseService firebaseService = new FirebaseService(FIREBASE_URL);
-        bufferManager = new RequestBufferManager(firebaseService);
+        bufferManager = new RequestBufferManager(firebaseService,URLJSONPATH);
         logger.log(Level.INFO,"RequestPayloadFilter Initialized");
     }
 
