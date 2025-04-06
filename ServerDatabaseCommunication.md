@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes how data is exchanged between the server and the database. It includes the format, schedule, and details of the data being shared, such as system hardware, operating system (OS), performance metrics, and installed components. Some data is sent only once, while other data is collected and transmitted on a regular schedule.
+This document describes how data is exchanged between the client/server and the database. It includes the format, schedule, and details of the data being shared, such as system hardware, operating system (OS), performance metrics, and installed components. Some data is sent only once, while other data is collected and transmitted on a regular schedule (time-series data).
 
 ---
 
@@ -29,329 +29,7 @@ Example: `/2025/04/06/14/30` (April 6, 2025, 2:30 PM)
   [ServerUrl]/[USERKEY]/[UUID]/<component>/<subcomponent>/<TimeSeriesURL>.json
   ```
 
-- `[ServerUrl]`: Base server address  openapi: 3.0.3
-info:
-  title: Server-to-Database API
-  description: |
-    This API defines the communication between a server and a database, including system hardware, operating system details, performance metrics, and installed components. Data is exchanged via static endpoints (sent once) and time-series endpoints (sent on a schedule).
-  version: 1.0.0
-
-servers:
-  - url: "{serverUrl}"
-    description: Base URL of the server
-    variables:
-      serverUrl:
-        default: "https://example.com"
-        description: The base server address
-
-paths:
-  /{userKey}/endpoint.json:
-    get:
-      summary: Endpoint Discovery
-      description: Retrieves a list of available endpoint URLs from the database.
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Unique user identifier
-      responses:
-        "200":
-          description: List of endpoint URLs
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-    post:
-      summary: Register Endpoints
-      description: Sends a list of available endpoint URLs to the database.
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Unique user identifier
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-      responses:
-        "201":
-          description: Endpoints successfully registered
-
-  /{userKey}/{uuid}/hardware/CPU.json:
-    post:
-      summary: Submit CPU Information
-      description: Sends CPU hardware details to the database (one-time submission).
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Unique user identifier
-        - name: uuid
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Unique system identifier
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CPU"
-      responses:
-        "201":
-          description: CPU data successfully submitted
-
-  /{userKey}/{uuid}/hardware/Memory.json:
-    post:
-      summary: Submit Memory Information
-      description: Sends memory hardware details to the database (one-time submission).
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: uuid
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Memory"
-      responses:
-        "201":
-          description: Memory data successfully submitted
-
-  /{userKey}/{uuid}/hardware/Memory/MemoryStats/{year}/{month}/{date}/{hours}/{minutes}.json:
-    post:
-      summary: Submit Memory Statistics
-      description: Sends scheduled memory usage statistics to the database.
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: uuid
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: year
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{4}$"
-        - name: month
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: date
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: hours
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: minutes
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/MemoryStats"
-      responses:
-        "201":
-          description: Memory stats successfully submitted
-
-  # Add other hardware endpoints (Storage, GPU, Network, Motherboard, OS) similarly...
-
-  /{userKey}/{uuid}/performance/UrlMethodCount/{year}/{month}/{date}/{hours}/{minutes}.json:
-    post:
-      summary: Submit URL Method Count
-      description: Sends scheduled counts of HTTP methods used by the server.
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: uuid
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: year
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{4}$"
-        - name: month
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: date
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: hours
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-        - name: minutes
-          in: path
-          required: true
-          schema:
-            type: string
-            pattern: "^[0-9]{2}$"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/UrlMethodCount"
-      responses:
-        "201":
-          description: URL method count successfully submitted
-
-  /{userKey}/{uuid}/Components/jars.json:
-    post:
-      summary: Submit JAR Files List
-      description: Sends a list of installed JAR files to the database (one-time submission).
-      parameters:
-        - name: userKey
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: uuid
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-      responses:
-        "201":
-          description: JAR files list successfully submitted
-
-components:
-  schemas:
-    CPU:
-      type: object
-      properties:
-        ModelName:
-          type: string
-        Architecture:
-          type: string
-        PhysicalCores:
-          type: integer
-        LogicalCores:
-          type: integer
-        ClockSpeed:
-          type: string
-        Vendor:
-          type: string
-        CacheSize:
-          type: string
-      required:
-        - ModelName
-        - Architecture
-        - PhysicalCores
-        - LogicalCores
-
-    Memory:
-      type: object
-      properties:
-        TotalInstalledMemory:
-          type: string
-        MemorySpeed:
-          type: string
-        MemoryType:
-          type: string
-        MemoryChannelCount:
-          type: integer
-        InstalledModuleCount:
-          type: integer
-      required:
-        - TotalInstalledMemory
-
-    MemoryStats:
-      type: object
-      properties:
-        FreeMemory:
-          type: string
-        UsedMemory:
-          type: string
-      required:
-        - FreeMemory
-        - UsedMemory
-
-    UrlMethodCount:
-      type: object
-      properties:
-        GET:
-          type: integer
-        PUT:
-          type: integer
-        POST:
-          type: integer
-        DELETE:
-          type: integer
-      required:
-        - GET
-        - PUT
-        - POST
-        - DELETE
-
-    # Add other schemas (Storage, GPU, Network, etc.) as needed...
+- `[ServerUrl]`: Base server address  
 - `[USERKEY]`: Unique user identifier  
 - `[UUID]`: Unique system identifier  
 - `<component>`: Category (e.g., hardware, performance)  
@@ -581,9 +259,22 @@ components:
 
 ---
 
+## Installed Components
+
+### JAR Files
+
+- **Frequency**: Sent once  
+- **URL**:  
+  ```
+  [ServerUrl]/[USERKEY]/[UUID]/Components/jars.json
+  ```
+- **Payload**: A JSON array (`~[JSONArray]`) listing all installed JAR files.
+
+---
+
 ## Build Update Logs
 
-**Frequency**: Sent once  
+- **Frequency**: Sent once  
 - **URL**:  
   ```
   [ServerUrl]/[USERKEY]/BuildUpdateLogs/[TimeSeriesURL].json
@@ -599,7 +290,7 @@ components:
 
 ## Alerts
 
-**Frequency**: Sent once  
+- **Frequency**: Sent once  
 - **URL**:  
   ```
   [ServerUrl]/[USERKEY]/Alerts/[TimeSeriesURL].json
@@ -614,19 +305,3 @@ components:
   ```
 
 ---
-
----
-
-## Installed Components
-
-### JAR Files
-
-- **Frequency**: Sent once  
-- **URL**:  
-  ```
-  [ServerUrl]/[USERKEY]/[UUID]/Components/jars.json
-  ```
-- **Payload**: A JSON array (`~[JSONArray]`) listing all installed JAR files.
-
----
-
